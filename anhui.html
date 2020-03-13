@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>安徽疫情地图</title>
+    <script src="echarts.min.js"></script>
+    <script src="jquery-1.11.1.min.js"></script>
+    <script src="province/anhui.js"></script>
+</head>
+<body>
+    <div id="form" style="height: 150px;width:1000px;background:grey;margin:auto;font-size:16px;font-weight:bold;">
+        <table style="border: white;" border=1 height="150" width="1000" cellspacing="0" align="center">
+        <tr align="center">
+            <td>现有确诊</td>
+            <td>新增确诊</td>
+            <td>累计确诊</td>
+            <td>累计治愈</td>
+            <td>累计死亡</td>
+        </tr>
+        <tr align="center">
+            <td style="color:orange;"> x </td>
+            <td style="color:brown;">  x </td>
+            <td style="color:red;"> x</td>
+            <td style="color:rgb(9, 170, 219);">  x  </td>
+            <td style="color:black;"> x  </td>
+        </tr>
+    </table>
+</div>
+    <script src="form.js"> </script>
+    
+    
+    <div id="map" style="height: 800px;width:1200px;background:white;margin:20px 0 0;"></div>	
+	<script type="text/javascript">
+		function randomData() {  
+     return Math.round(Math.random()*50);  
+} 
+    // 各市列表
+    var dataMap = [ 
+                {name: '合肥市',value: randomData() },{name: '淮南市',value: randomData() },  
+                {name: '芜湖市',value: randomData() },{name: '蚌埠市',value: randomData() },  
+                {name: '安庆市',value: randomData() },{name: '阜阳市',value: randomData() },  
+                {name: '六安市',value: randomData() },{name: '黄山市',value: randomData() },  
+                {name: '马鞍山市',value: randomData() },{name: '淮北市',value: randomData() },  
+                {name: '铜陵市',value: randomData() },{name: '滁州市',value: randomData() },  
+                {name: '宣城市',value: randomData() },{name: '宿州市',value: randomData() },  
+                {name: '亳州市',value: randomData() },{name: '池州市',value: randomData() },  
+                ];   
+    
+    // 绘制图表，准备数据
+    var option = {
+		title: {  
+                  text: '疫情地图',  
+                  subtext: '',  
+                  x:'center'  
+                },  
+        tooltip: {
+            
+            backgroundColor: 'rgba(61,61,61, 0.3)',//提示标签背景颜色
+            textStyle: { color: "#0A0A0A" } //提示标签字体颜色
+        },
+		dataRange: {
+            x: 'left',         
+            splitList: [
+               {start:500},
+				{start:100,end:499},
+				{start:50,end:99},
+				{start:10,end:49},
+				{start:1,end:9},
+				{start:0,end:0}
+            ],
+            color: ['#FF0000','#FFF68F','#FFFFFF']
+        },
+        series: [
+            {
+                name: '安徽',
+                type: 'map',
+                mapType: '安徽',
+				//鼠标点击选中
+                //selectedMode: 'multiple',
+                label: {
+                    normal: {
+                        show: true,//显示市标签
+                         textStyle:{color:"#0A0A0A"}//市标签字体颜色
+                    },
+                    emphasis: {
+                        show: true,//对应的鼠标悬浮效果
+                         //textStyle:{color:"#800080"}
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        borderWidth: .5,//区域边框宽度
+                         borderColor: '#009fe8',//区域边框颜色
+                         areaColor:"#ffefd5",//区域颜色
+                    },
+                    emphasis: {
+                        borderWidth: .5,
+                        borderColor: '#4b0082',
+                        areaColor: "#9AFF9A",
+                    }
+                },
+                data: dataMap
+            }
+        ]
+    };
+    //初始化echarts实例
+    var myChart = echarts.init(document.getElementById('map'));
+    //使用制定的配置项和数据显示图表
+    myChart.setOption(option);
+		
+</script>
+<div id="trend line" style="height: 800px;width:1200px;background:white;margin:20px 0 0;"></div>
+<script src="threndline.js"></script>
+
+</body>
+
+</html>
