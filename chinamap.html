@@ -24,14 +24,24 @@ function drawline(data1,data2,chartname)//data1,data2
         var infectedData = [];
 		var suspectedData=[];*/
 		var date = [];
-		var n=7;
+		var n=14; //显示14天
 		var base=new Date();
+		
         for (var i = 0; i <n; i++) {
             var now =new Date();
-			now.setDate(base.getDate()-(n-i));
-            date.push([now.getFullYear(), now.getMonth(), now.getDate()].join('/'));			
+			now.setDate(base.getDate()+(i-n));			
+            date.push([now.getMonth()+1, now.getDate()].join('/'));			
         }
-   
+		if(chartname=="确诊/疑似趋势")
+		{
+			var name1="累计确诊人数";
+		var name2="当前疑似人数";
+		}
+		else if(chartname=="累计治愈/死亡")
+		{
+			var name1="累计治愈人数";
+		var name2="累计死亡人数";
+		}
      // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.getElementById('trend line'));
 		myChart.clear();
@@ -63,9 +73,9 @@ function drawline(data1,data2,chartname)//data1,data2
             },
             yAxis: {
                 type: 'value', // 'value' 数值轴，适用于连续数据。
-                boundaryGap: [0, '100%'] // 分别表示数据最小值和最大值的延伸范围，可以直接设置数值或者相对的百分比，
+                boundaryGap: [0, '1%'] // 分别表示数据最小值和最大值的延伸范围，可以直接设置数值或者相对的百分比，
             },
-            /*dataZoom: [{                 // 内置于坐标系中，使用户可以在坐标系上通过鼠标拖拽、鼠标滚轮、手指滑动（触屏上）来缩放或漫游坐标系 
+            dataZoom: [{                 // 内置于坐标系中，使用户可以在坐标系上通过鼠标拖拽、鼠标滚轮、手指滑动（触屏上）来缩放或漫游坐标系 
                 type: 'inside',
                 start: 0,
                 end: 10
@@ -80,11 +90,11 @@ function drawline(data1,data2,chartname)//data1,data2
                     shadowOffsetX: 2,
                     shadowOffsetY: 2
                 }
-            } ],*/
+            } ],
 			
             series: [
                 {
-                    name: '累计确诊',
+                    name: name1,
                     type: 'line',
                     //smooth: true,  // 开启平滑处理。true的平滑程度相当于0.5                
                     sampling: 'average', //  取过滤点的平均值
@@ -97,7 +107,7 @@ function drawline(data1,data2,chartname)//data1,data2
                     data: data1
                 },
 				{
-                    name: '累计疑似',
+                    name: name2,
                     type: 'line',
                     //smooth: true,  // 开启平滑处理。true的平滑程度相当于0.5                
                     sampling: 'average', //  取过滤点的平均值
@@ -248,10 +258,12 @@ function drawline(data1,data2,chartname)//data1,data2
 <script>
 	function switchchart(id,data)
 	{
+		//console.log("id="+id);
+		//console.log(data[0].confirm);
 		var len=0;
 		for(var k in data)len++;
 		
-		var i=len>=7?(len-7):len-1;
+		var i=len>=14?(len-14):len-1;
 		var data1=[];//confirm or heal
 		var data2=[];//suspect or dead
 		var chartname;//将要渲染的图表名
@@ -260,8 +272,9 @@ function drawline(data1,data2,chartname)//data1,data2
 			chartname="确诊/疑似趋势";
 			for(;i<len;i++)
 			{
-				data1.push(data[i].confirm);
-				data1.push(data[i].suspect);
+				data1.push(data[i].confirm);				
+				data2.push(data[i].suspect);
+				
 			}
 		}
 		else if(id=="heal_dead")
@@ -270,7 +283,7 @@ function drawline(data1,data2,chartname)//data1,data2
 			for(;i<len;i++)
 			{
 				data1.push(data[i].heal);
-				data1.push(data[i].dead);
+				data2.push(data[i].dead);
 			}
 		}
 		
@@ -311,7 +324,7 @@ function drawline(data1,data2,chartname)//data1,data2
 			{
 				if (requst2.status == 200 && requst2.readyState == 4 ) {
                     historyjson = JSON.parse(requst2.responseText);	
-					console.log(historyjson);
+					//console.log(historyjson);
 					switchchart("confirm_sus",historyjson);						
 				}	
 			}			
@@ -324,8 +337,8 @@ function drawline(data1,data2,chartname)//data1,data2
 <div id="trend line" style="height: 800px;width:1200px;margin:auto;"></div>
 
 <div id="buttons" style="text-align: center;margin: 0 auto;">
-<button type="button" class="btn btn-default" id="confirm_sus" onClick="switchchart('this.id')">确诊/疑似趋势</button>
-<button type="button" class="btn btn-default" id="heal_dead" onClick="switchchart('this.id')">累计治愈/死亡</button>
+<button type="button" class="btn btn-default" id="confirm_sus" onClick=switchchart(this.id,historyjson)>确诊/疑似趋势</button>
+<button type="button" class="btn btn-default" id="heal_dead" onClick=switchchart(this.id,historyjson)>累计治愈/死亡</button>
 <button type="button" class="btn btn-default">默认</button>
 </div>
 
