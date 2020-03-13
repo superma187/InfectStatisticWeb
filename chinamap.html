@@ -4,12 +4,7 @@
 <head>
 <meta charset="utf-8">
 <title>中国地图(疫情)</title>
-<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
-<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="../../echarts-html5-canvas-map/js/jquery-1.11.1.min.js"></script>
-<script src="../../echarts-html5-canvas-map/js/echarts.min.js"></script>
-<script src="../../echarts-html5-canvas-map/js/china.js"></script>
+
 
 <!-- 折线图-->
 <script type="text/javascript">
@@ -190,13 +185,54 @@ function drawline()
 <!--统计表格-->
 <script>
 	//获取表格的容器
-	function test()
+	function test(dataMap)
 	{
-		var p=document.createElement("p");
-		var tb=document.getElementById('tablecontainer');
-		p.innerHTML="asdas";
-		tb.appendChild(p);
-		
+		div=document.createElement("div");
+		table = document.createElement("table");
+		tBody = document.createElement("tBody");
+		tr = document.createElement("tr");
+		nameth=document.createElement("th");
+		nameth.innerHTML="省份";
+		totalth=document.createElement("th");
+		totalth.innerHTML="感染总人数";
+		suspectth=document.createElement("th");
+		suspectth.innerHTML="疑似人数";
+		deadth=document.createElement("th");
+		deadth.innerHTML="死亡人数";
+		health=document.createElement("th");
+		health.innerHTML="治愈人数";
+		tr.appendChild(nameth);
+		tr.appendChild(totalth);
+		tr.appendChild(suspectth);
+		tr.appendChild(deadth);
+		tr.appendChild(health);
+		tBody.appendChild(tr);
+		for(var i in dataMap)
+		{
+			ntr=document.createElement("tr");
+			td1 = document.createElement("td");
+			td1.innerHTML=dataMap[i].name;
+			td2 = document.createElement("td");
+			td2.innerHTML=dataMap[i].value;
+			td3 = document.createElement("td");
+			td3.innerHTML=dataMap[i].suspect;
+			td4 = document.createElement("td");
+			td4.innerHTML=dataMap[i].dead;
+			td5 = document.createElement("td");
+			td5.innerHTML=dataMap[i].heal;
+			ntr.appendChild(td1);
+			ntr.appendChild(td2);
+			ntr.appendChild(td3);
+			ntr.appendChild(td4);
+			ntr.appendChild(td5);
+			tBody.appendChild(ntr);
+		}		
+	table.appendChild(tBody);
+	table.className="table table-striped";
+	div.appendChild(table);
+	div.style.width="1200px";
+	div.style.margin="auto";
+	document.body.appendChild(div);		
 	}
 	
 </script>
@@ -223,22 +259,24 @@ function drawline()
 				}
 						drawchina(dataMap);
 						drawline();
-						test();
+						test(dataMap);
 				}										
 			}								
 		
 </script>
 <!-- 地图的容器 -->
-<div id="trend line" style="height: 800px;width:1200px;background:white;margin:auto;"></div>
+
 <div id="chinamap" style="height: 800px;width:1200px;background:white;margin:auto;"></div>
-<div class="tablecontainer" style="margin:auto;width:1200px;">
-	<h2>疫情统计数据</h2>               
-	
-</div>
+<div id="trend line" style="height: 800px;width:1200px;background:white;margin:auto;"></div>
 
 
 
 	
-
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="../../echarts-html5-canvas-map/js/jquery-1.11.1.min.js"></script>
+<script src="../../echarts-html5-canvas-map/js/echarts.min.js"></script>
+<script src="../../echarts-html5-canvas-map/js/china.js"></script>
 </body>
 </html>
