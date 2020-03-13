@@ -9,9 +9,9 @@
 <!-- 折线图-->
 <script type="text/javascript">
 		
-function drawline()
+function drawline(data1,data2,chartname)//data1,data2
 {
-	var n=7;
+	/*var n=7;
 		var infsum=0;	
 		var susum=0;
         var date = [];
@@ -26,7 +26,7 @@ function drawline()
 			susum+=Math.random()*100;
             infectedData.push(infsum);
 			suspectedData.push(susum);
-        }
+        }*/
    
      // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.getElementById('trend line'));
@@ -38,7 +38,7 @@ function drawline()
             },
             title: {
                 left: 'center',
-                text: '疫情累计确诊/疑似趋势'
+                text: chartname
             },
             // toolbox：这是ECharts中的工具栏。内置有导出图片、数据视图、动态类型切换、数据区域缩放、重置五个工具。
             toolbox: {
@@ -89,7 +89,7 @@ function drawline()
                         
                     },
                     
-                    data: infectedData
+                    data: data1
                 },
 				{
                     name: '累计疑似',
@@ -102,7 +102,7 @@ function drawline()
                         
                     },
                     
-                    data: suspectedData
+                    data: data2
                 }
             ]
         });
@@ -184,6 +184,7 @@ function drawline()
 </script>
 <!--统计表格-->
 <script>
+
 	//获取表格的容器
 	function test(dataMap)
 	{
@@ -236,11 +237,43 @@ function drawline()
 	}
 	
 </script>
-
+<!--图表切换-->
+<script>
+	function switchchart(id,data)
+	{
+		var len=data.length;
+		var i=len>=7?(len-7):len-1;
+		var data1=[];//confirm or heal
+		var data2=[];//suspect or dead
+		var chartname;//将要渲染的图表名
+		if(id=="confirm_sus")
+		{
+			chartname="确诊/疑似趋势";
+			for(;i<len;i++)
+			{
+				data1.push(data[i].confirm);
+				data1.push(data[i].suspect);
+			}
+		}
+		else if(id=="heal_dead")
+		{
+			chartname="累计治愈/死亡";
+			for(;i<len;i++)
+			{
+				data1.push(data[i].heal);
+				data1.push(data[i].dead);
+			}
+		}
+		
+		drawline(data1,data2,chartname);
+	}
+</script>
 </head>
 
-<body>
-<!---->
+<body background="background-cloud.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed;">
+
+</body>
+
 <script>
 		  	var url='../updated.json';
 			var requst=new XMLHttpRequest();
@@ -261,13 +294,34 @@ function drawline()
 						drawline();
 						test(dataMap);
 				}										
-			}								
+			}
+
+				var url='../history.json';
+			var requst=new XMLHttpRequest();
+			requst.open('get',url);
+			requst.send(null);
+			var dataset
+			requst.onreadystatechange=function()
+			{
+				if (requst.status == 200 && requst.readyState == 4 ) {
+                    var historyjson = JSON.parse(requst.responseText);	
+					switchchart("confirm_sus",historyjson);						
+				}	
+			}			
 		
 </script>
 <!-- 地图的容器 -->
 
-<div id="chinamap" style="height: 800px;width:1200px;background:white;margin:auto;"></div>
-<div id="trend line" style="height: 800px;width:1200px;background:white;margin:auto;"></div>
+<div id="chinamap" style="height: 800px;width:1200px;margin:auto;"></div>
+
+<div id="trend line" style="height: 800px;width:1200px;margin:auto;"></div>
+
+<div id="buttons" style="text-align: center;margin: 0 auto;">
+<button type="button" class="btn btn-default" id="confirm_sus" onClick="switchchart('this.id')">确诊/疑似趋势</button>
+<button type="button" class="btn btn-default" id="heal_dead" onClick="switchchart('this.id')">累计治愈/死亡</button>
+<button type="button" class="btn btn-default">默认</button>
+</div>
+
 
 
 
