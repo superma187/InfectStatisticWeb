@@ -4,32 +4,37 @@
 <head>
 <meta charset="utf-8">
 <title>中国地图(疫情)</title>
-
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="../../echarts-html5-canvas-map/js/jquery-1.11.1.min.js"></script>
+<script src="../../echarts-html5-canvas-map/js/echarts.min.js"></script>
+<script src="../../echarts-html5-canvas-map/js/china.js"></script>
 
 <!-- 折线图-->
 <script type="text/javascript">
 		
 function drawline(data1,data2,chartname)//data1,data2
 {
-	/*var n=7;
+	/*
 		var infsum=0;	
 		var susum=0;
-        var date = [];
-		var base=new Date();
+        
+		
         var infectedData = [];
-		var suspectedData=[];
+		var suspectedData=[];*/
+		var date = [];
+		var n=7;
+		var base=new Date();
         for (var i = 0; i <n; i++) {
             var now =new Date();
 			now.setDate(base.getDate()-(n-i));
-            date.push([now.getFullYear(), now.getMonth(), now.getDate()].join('/'));
-			infsum+=Math.random()*100;
-			susum+=Math.random()*100;
-            infectedData.push(infsum);
-			suspectedData.push(susum);
-        }*/
+            date.push([now.getFullYear(), now.getMonth(), now.getDate()].join('/'));			
+        }
    
      // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.getElementById('trend line'));
+		myChart.clear();
         myChart.setOption({
             tooltip: {
                 // 当trigger为’item’时只会显示该点的数据，为’axis’时显示该列下所有坐标轴所对应的数据。
@@ -108,13 +113,13 @@ function drawline(data1,data2,chartname)//data1,data2
         });
 }
 	</script>
+
 <!-- 全国密度图-->
 <script type="text/javascript">
     // 全国省份列表					
  function drawchina(dataMap)
  {
 	    
-    
     // 绘制图表，准备数据
     var option = {
 		title: {  
@@ -182,11 +187,12 @@ function drawline(data1,data2,chartname)//data1,data2
  }
 		
 </script>
+
 <!--统计表格-->
 <script>
 
 	//获取表格的容器
-	function test(dataMap)
+	function drawtable(dataMap)
 	{
 		div=document.createElement("div");
 		table = document.createElement("table");
@@ -237,11 +243,14 @@ function drawline(data1,data2,chartname)//data1,data2
 	}
 	
 </script>
+
 <!--图表切换-->
 <script>
 	function switchchart(id,data)
 	{
-		var len=data.length;
+		var len=0;
+		for(var k in data)len++;
+		
 		var i=len>=7?(len-7):len-1;
 		var data1=[];//confirm or heal
 		var data2=[];//suspect or dead
@@ -272,8 +281,6 @@ function drawline(data1,data2,chartname)//data1,data2
 
 <body background="background-cloud.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed;">
 
-</body>
-
 <script>
 		  	var url='../updated.json';
 			var requst=new XMLHttpRequest();
@@ -291,20 +298,20 @@ function drawline(data1,data2,chartname)//data1,data2
 				dataMap.push({"name":dataset[i].name,"value":dataset[i].total.confirm,"suspect":dataset[i].total.suspect,"dead":dataset[i].total.dead,"heal":dataset[i].total.heal});
 				}
 						drawchina(dataMap);
-						drawline();
-						test(dataMap);
+						drawtable(dataMap);
 				}										
 			}
 
-				var url='../history.json';
-			var requst=new XMLHttpRequest();
-			requst.open('get',url);
-			requst.send(null);
-			var dataset
-			requst.onreadystatechange=function()
+			var url2='../history.json';
+			var requst2=new XMLHttpRequest();
+			requst2.open('get',url2);
+			requst2.send(null);
+			var historyjson ;			
+			requst2.onreadystatechange=function()
 			{
-				if (requst.status == 200 && requst.readyState == 4 ) {
-                    var historyjson = JSON.parse(requst.responseText);	
+				if (requst2.status == 200 && requst2.readyState == 4 ) {
+                    historyjson = JSON.parse(requst2.responseText);	
+					console.log(historyjson);
 					switchchart("confirm_sus",historyjson);						
 				}	
 			}			
@@ -326,11 +333,6 @@ function drawline(data1,data2,chartname)//data1,data2
 
 
 	
-<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
-<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="../../echarts-html5-canvas-map/js/jquery-1.11.1.min.js"></script>
-<script src="../../echarts-html5-canvas-map/js/echarts.min.js"></script>
-<script src="../../echarts-html5-canvas-map/js/china.js"></script>
+
 </body>
 </html>
