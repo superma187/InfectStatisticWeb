@@ -53,7 +53,10 @@ function drawline(data1,data2,chartname)//data1,data2
             },
             title: {
                 left: 'center',
-                text: chartname
+                text: chartname,
+				textStyle: {
+				  fontSize: '28',
+				  },
             },
             // toolbox：这是ECharts中的工具栏。内置有导出图片、数据视图、动态类型切换、数据区域缩放、重置五个工具。
             toolbox: {
@@ -135,6 +138,10 @@ function drawline(data1,data2,chartname)//data1,data2
 		title: {  
                   text: '疫情地图',  
                   subtext: '',  
+				  
+				  textStyle: {
+				  fontSize: '34',
+				  },
                   x:'center'  
                 },  
         tooltip: {
@@ -198,7 +205,7 @@ function drawline(data1,data2,chartname)//data1,data2
 		
 </script>
 
-<!--统计表格-->
+<!--省份统计表格-->
 <script>
 
 	//获取表格的容器
@@ -254,6 +261,18 @@ function drawline(data1,data2,chartname)//data1,data2
 	
 </script>
 
+<!--总体统计表格-->
+<script>
+function drawtotal(data)
+{
+	var list=document.getElementsByClassName('tds');
+	for(var i=0;i<list.length;i++)
+	{		
+		list[i].innerHTML=data[i];
+	}
+}
+</script>
+
 <!--图表切换-->
 <script>
 	function switchchart(id,data)
@@ -293,7 +312,6 @@ function drawline(data1,data2,chartname)//data1,data2
 </head>
 
 <body background="background-cloud.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed;">
-
 <script>
 		  	var url='../updated.json';
 			var requst=new XMLHttpRequest();
@@ -305,6 +323,14 @@ function drawline(data1,data2,chartname)//data1,data2
 			 if (requst.status == 200 && requst.readyState == 4 ) {
                     var json = JSON.parse(requst.responseText);	
 					dataset=json.areaTree[0].children;
+					var datafortotal=[];
+					datafortotal.push(json.chinaTotal.nowConfirm);
+					
+					datafortotal.push(json.chinaAdd.confirm);
+					datafortotal.push(json.chinaTotal.confirm);
+					datafortotal.push(json.chinaTotal.heal);
+					datafortotal.push(json.chinaTotal.dead);
+					drawtotal(datafortotal);
 					var dataMap=[];
 						for (var i in dataset)
 				{	 				
@@ -330,6 +356,26 @@ function drawline(data1,data2,chartname)//data1,data2
 			}			
 		
 </script>
+<div id="form" style="height: 150px;width:1000px;background:#DEDEDE;margin:auto;font-size:16px;font-weight:bold;">
+        <table style="border: white;" border=1 height="150" width="1000" cellspacing="0" align="center">
+        <tr align="center">
+            <td>现有确诊</td>
+            <td>新增确诊</td>
+            <td>累计确诊</td>
+            <td>累计治愈</td>
+            <td>累计死亡</td>
+        </tr>
+        <tr align="center">
+            <td class="tds" style="color:orange;"> x </td>
+            <td class="tds" style="color:brown;">  x </td>
+            <td class="tds" style="color:red;"> x</td>
+            <td class="tds" style="color:rgb(9, 170, 219);">  x  </td>
+            <td class="tds" style="color:black;"> x  </td>
+        </tr>
+    </table>
+</div>
+<br>
+
 <!-- 地图的容器 -->
 
 <div id="chinamap" style="height: 800px;width:1200px;margin:auto;"></div>
