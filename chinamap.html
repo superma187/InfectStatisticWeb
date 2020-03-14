@@ -5,16 +5,21 @@
 <meta charset="utf-8">
 <title>中国地图(疫情)</title>
 <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+ <link rel="stylesheet" type="text/css" href="style.css" />
 <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="../../echarts-html5-canvas-map/js/jquery-1.11.1.min.js"></script>
 <script src="../../echarts-html5-canvas-map/js/echarts.min.js"></script>
 <script src="../../echarts-html5-canvas-map/js/china.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+ <link rel="stylesheet" href="/resources/demos/style.css">
+ <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+ <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <!-- 折线图-->
 <script type="text/javascript">
 		
-function drawline(data1,data2,chartname)//data1,data2
+function drawLine(data1,data2,chartname)//data1,data2
 {
 	/*
 		var infsum=0;	
@@ -130,7 +135,7 @@ function drawline(data1,data2,chartname)//data1,data2
 <!-- 全国密度图-->
 <script type="text/javascript">
     // 全国省份列表					
- function drawchina(dataMap)
+ function drawChina(dataMap)
  {
 	    
     // 绘制图表，准备数据
@@ -199,17 +204,112 @@ function drawline(data1,data2,chartname)//data1,data2
     };
     //初始化echarts实例
     var myChart = echarts.init(document.getElementById('chinamap'));
+	myChart.clear();
     //使用制定的配置项和数据显示图表
     myChart.setOption(option);
+	myChart.on('click', function (params) {
+			drawProvince(params.name,dataset);
+     });
  }
 		
+</script>
+
+<!--省份图-->
+<script>
+	function drawProvince(provName,data)
+	{
+		var cityMap=[];
+		for(var i in data)
+		{
+			if(data[i].name==provName)
+			{
+				//遍历省份的市列表
+				var citylist=data[i].children;
+				for(var j in citylist)
+				{
+					cityMap.push({'name':citylist[j].name,'value':citylist[j].total.confirm});
+				}
+				break;
+			}
+		}
+		
+	
+		var option = {
+		title: {  
+                  text: provName+'疫情地图',  
+                  subtext: '',  
+				  
+				  textStyle: {
+				  fontSize: '34',
+				  },
+                  x:'center'  
+                },  
+        tooltip: {
+            formatter: function (params) {
+                var info = '<p style="font-size:18px;font-weight:bold">' + params.name + '</p><p style="font-size:14px">感染人数'+params.value+'人</p>'
+                return info;
+            },
+            backgroundColor: 'rgba(61,61,61, 0.3)',//提示标签背景颜色
+            textStyle: { color: "#0A0A0A" } //提示标签字体颜色
+        },
+		dataRange: {
+            x: 'left',         
+            splitList: [
+               {start:5000},
+				{start:1000,end:4999},
+				{start:500,end:999},
+				{start:100,end:499},
+				{start:1,end:99},
+				{start:0,end:0}
+            ],
+            color: ['#FF0000','#FFF68F','#FFFFFF']
+        },
+        series: [
+            {
+                name: provName,
+                type: 'map',
+                mapType: 'province',
+				//鼠标点击选中
+                //selectedMode: 'multiple',
+                label: {
+                    normal: {
+                        show: true,//显示省份标签
+                         textStyle:{color:"#0A0A0A"}//省份标签字体颜色
+                    },
+                    emphasis: {
+                        show: true,//对应的鼠标悬浮效果
+                         //textStyle:{color:"#800080"}
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        borderWidth: .5,//区域边框宽度
+                         borderColor: '#009fe8',//区域边框颜色
+                         areaColor:"#ffefd5",//区域颜色
+                    },
+                    emphasis: {
+                        borderWidth: .5,
+                        borderColor: '#4b0082',
+                        areaColor: "#9AFF9A",
+                    }
+                },
+                data: cityMap
+            }
+        ]
+    };
+    //初始化echarts实例
+    var myChart = echarts.init(document.getElementById('chinamap'));
+	myChart.clear();
+    //使用制定的配置项和数据显示图表
+    myChart.setOption(option);
+	}
 </script>
 
 <!--省份统计表格-->
 <script>
 
 	//获取表格的容器
-	function drawtable(dataMap)
+	function drawTable(dataMap)
 	{
 		div=document.createElement("div");
 		table = document.createElement("table");
@@ -263,7 +363,7 @@ function drawline(data1,data2,chartname)//data1,data2
 
 <!--总体统计表格-->
 <script>
-function drawtotal(data)
+function drawTotal(data)
 {
 	var list=document.getElementsByClassName('tds');
 	for(var i=0;i<list.length;i++)
@@ -275,7 +375,7 @@ function drawtotal(data)
 
 <!--图表切换-->
 <script>
-	function switchchart(id,data)
+	function switchChart(id,data)
 	{
 		//console.log("id="+id);
 		//console.log(data[0].confirm);
@@ -306,58 +406,78 @@ function drawtotal(data)
 			}
 		}
 		
-		drawline(data1,data2,chartname);
+		drawLine(data1,data2,chartname);
 	}
 </script>
-</head>
 
-<body background="background-cloud.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed;">
 <script>
-		  	var url='../updated.json';
+	function initRumor()
+	{
+			//获取谣言数据
+			var url='../rumor.json';
 			var requst=new XMLHttpRequest();
 			requst.open('get',url);
 			requst.send(null);
-			var dataset
+			var rumorjson ;	 ////		
 			requst.onreadystatechange=function()
 			{
-			 if (requst.status == 200 && requst.readyState == 4 ) {
-                    var json = JSON.parse(requst.responseText);	
-					dataset=json.areaTree[0].children;
-					var datafortotal=[];
-					datafortotal.push(json.chinaTotal.nowConfirm);
+				if (requst.status == 200 && requst.readyState == 4 ) {
+                    rumorjson = JSON.parse(requst.responseText);	
+					//获取谣言版的所有标签		
 					
-					datafortotal.push(json.chinaAdd.confirm);
-					datafortotal.push(json.chinaTotal.confirm);
-					datafortotal.push(json.chinaTotal.heal);
-					datafortotal.push(json.chinaTotal.dead);
-					drawtotal(datafortotal);
-					var dataMap=[];
-						for (var i in dataset)
-				{	 				
-				dataMap.push({"name":dataset[i].name,"value":dataset[i].total.confirm,"suspect":dataset[i].total.suspect,"dead":dataset[i].total.dead,"heal":dataset[i].total.heal});
-				}
-						drawchina(dataMap);
-						drawtable(dataMap);
-				}										
-			}
-
-			var url2='../history.json';
-			var requst2=new XMLHttpRequest();
-			requst2.open('get',url2);
-			requst2.send(null);
-			var historyjson ;			
-			requst2.onreadystatechange=function()
-			{
-				if (requst2.status == 200 && requst2.readyState == 4 ) {
-                    historyjson = JSON.parse(requst2.responseText);	
-					//console.log(historyjson);
-					switchchart("confirm_sus",historyjson);						
+					
+					var rumors=document.getElementsByName('rumorTag');
+					var len=rumors.length;					
+					for(var i=0;i<len;i++)
+					{												
+						rumors[i].href=rumorjson[i].url;
+						rumors[i].innerHTML=rumorjson[i].query;
+					}
 				}	
 			}			
-		
+	}
 </script>
-<div id="form" style="height: 150px;width:1000px;background:#DEDEDE;margin:auto;font-size:16px;font-weight:bold;">
-        <table style="border: white;" border=1 height="150" width="1000" cellspacing="0" align="center">
+
+<!--设置新闻数据-->
+<script>
+	function initNews()
+	{
+			var url='../news.json';
+			var requst=new XMLHttpRequest();
+			requst.open('get',url);
+			requst.send(null);
+			var newsjson ;	 ////		
+			requst.onreadystatechange=function()
+			{
+				if (requst.status == 200 && requst.readyState == 4 ) {
+                    newsjson = JSON.parse(requst.responseText);	
+					//获取谣言版的所有标签		
+					
+					
+					var news=document.getElementsByName('newsTag');
+					var len=news.length;					
+					for(var i=0;i<len;i++)
+					{		
+						console.log(newsjson[i].title);
+						news[i].href=newsjson[i].sourceUrl;
+						news[i].innerHTML=newsjson[i].title;
+					}
+				}	
+			}			
+	}
+</script>
+<script>
+  $( function() {
+    $( "#datepicker" ).datepicker();
+  } );
+  </script>
+</head>
+
+<body background="background-cloud.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%; background-attachment: fixed;">
+
+<div id="form">
+        <div id="tablehead" align="center"><img src="bg.png" alt="background.png" width="1000px" height="100px" /></div>
+        <table id="formdata" style="border: white;font-size:16px;font-weight:bold;background:grey;" border=1 height="150" width="1000" cellspacing="0" align="center">
         <tr align="center">
             <td>现有确诊</td>
             <td>新增确诊</td>
@@ -365,7 +485,7 @@ function drawtotal(data)
             <td>累计治愈</td>
             <td>累计死亡</td>
         </tr>
-        <tr align="center">
+        <tr id="tabledata" align="center">
             <td class="tds" style="color:orange;"> x </td>
             <td class="tds" style="color:brown;">  x </td>
             <td class="tds" style="color:red;"> x</td>
@@ -373,25 +493,123 @@ function drawtotal(data)
             <td class="tds" style="color:black;"> x  </td>
         </tr>
     </table>
-</div>
+    </div>
 <br>
 
 <!-- 地图的容器 -->
-
+<p align="center">Date: <input type="text" id="datepicker"></p>
 <div id="chinamap" style="height: 800px;width:1200px;margin:auto;"></div>
 
 <div id="trend line" style="height: 800px;width:1200px;margin:auto;"></div>
 
 <div id="buttons" style="text-align: center;margin: 0 auto;">
-<button type="button" class="btn btn-default" id="confirm_sus" onClick=switchchart(this.id,historyjson)>确诊/疑似趋势</button>
-<button type="button" class="btn btn-default" id="heal_dead" onClick=switchchart(this.id,historyjson)>累计治愈/死亡</button>
+<button type="button" class="btn btn-default" id="confirm_sus" onClick=switchChart(this.id,historyjson)>确诊/疑似趋势</button>
+<button type="button" class="btn btn-default" id="heal_dead" onClick=switchChart(this.id,historyjson)>累计治愈/死亡</button>
 <button type="button" class="btn btn-default">默认</button>
 </div>
+<br>
+<div id="board" style="height:800px;">
+        
+              <div id="news">
+            <h2 align="center">疫情最新消息</h2>
+            <div class="n1">
+                <div class="n1_div" id="t1"><p>03月12日  18:41</p></div>
+                <div class="n1_text" >
+                  <a id="new1" name="newsTag" href="http://baijiahao.baidu.com/s?id=1660954482920743991">N/A</a>
+                </div>
+              </div>
+              <div class="n1">
+                <div class="n1_div" id=t2><p>03月12日  17:26</p></div>
+                <div class="n1_text" >
+                    <a id="new2" name="newsTag" href="http://baijiahao.baidu.com/s?id=1660949896892472165">N/A</a>
+                </div>
+              </div>
+              <div class="n1">
+                <div class="n1_div" id="t3"><p>03月12日  17:18</p></div>
+                <div class="n1_text" >
+                    <a id="new3" name="newsTag" href="http://baijiahao.baidu.com/s?id=1660949283335310029">N/A</a>
+                </div>
+              </div>
+              <div class="n1">
+                <div class="n1_div" id="t4"><p>03月12日  16:58</p></div>
+                <div class="n1_text" >
+                    <a id="new4" name="newsTag" href="http://baijiahao.baidu.com/s?id=1660948034233288258">N/A</a>
+                </div>
+              </div>
+              <div class="n1">
+                <div class="n1_div" id="t5"><p>03月12日  15:30</p></div>
+                <div class="n1_text"  >
+                    <a id="new5" name="newsTag" href="http://baijiahao.baidu.com/s?id=1660942493507997734">N/A</a>
+                </div>
+              </div>
+        </div>
+        <div id="rumour" style="height:800px;width:600px;margin:auto;">
+            <h2 align="center" style="color:red">热搜谣言粉碎</h2>
+            <div class="rumf1" >
+                <a id="rum1" name="rumorTag" href="https://m.baidu.com/sf_baijiahao/s?id=1660652730836051950">N/A</a>
+              </div>
+              <div class="rumf2" >
+                <a id="rum2" name="rumorTag" href="https://m.baidu.com/sf_baijiahao/s?id=1660653399822913400">N/A</a>
+              </div>
+              <div class="rumf3" >
+                <a id="rum3" name="rumorTag" href="https://m.baidu.com/sf_baijiahao/s?id=1660657915354221056">N/A</a>
+              </div>
+              <div class="rumf4" >
+                <a id="rum4" name="rumorTag" href="https://m.baidu.com/sf_baijiahao/s?id=1660653399822913400">N/A</a>
+              </div>
+              <div class="rumf5" >
+                <a id="rum5" name="rumorTag" href="https://m.baidu.com/sf_baijiahao/s?id=1660667271285018421">N/A</a>
+              </div>             
+        </div>
+        </div>
 
 
+<script>
+		  	var url='../updated.json';
+			var requst=new XMLHttpRequest();
+			requst.open('get',url);
+			requst.send(null);
+			var dataset  ////
+			requst.onreadystatechange=function()
+			{
+			 if (requst.status == 200 && requst.readyState == 4 ) {
+                    var json = JSON.parse(requst.responseText);	
+					dataset=json.areaTree[0].children;
+					var datafortotal=[];
+					datafortotal.push(json.chinaTotal.nowConfirm);					
+					datafortotal.push(json.chinaAdd.confirm);
+					datafortotal.push(json.chinaTotal.confirm);
+					datafortotal.push(json.chinaTotal.heal);
+					datafortotal.push(json.chinaTotal.dead);
+					drawTotal(datafortotal);
+					var dataMap=[];
+						for (var i in dataset)
+				{	 				
+				dataMap.push({"name":dataset[i].name,"value":dataset[i].total.confirm,"suspect":dataset[i].total.suspect,"dead":dataset[i].total.dead,"heal":dataset[i].total.heal});
+				}
+						drawChina(dataMap);
+						drawTable(dataMap);
+				}										
+			}
 
-
-	
+			var url2='../history.json';
+			var requst2=new XMLHttpRequest();
+			requst2.open('get',url2);
+			requst2.send(null);
+			var historyjson ;	 ////		
+			requst2.onreadystatechange=function()
+			{
+				if (requst2.status == 200 && requst2.readyState == 4 ) {
+                    historyjson = JSON.parse(requst2.responseText);	
+					//console.log(historyjson);
+					switchChart("confirm_sus",historyjson);						
+				}	
+			}		
+			
+			initRumor();
+			initNews();
+		
+</script>	
 
 </body>
 </html>
