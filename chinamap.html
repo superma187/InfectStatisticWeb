@@ -5,17 +5,17 @@
 <meta charset="utf-8">
 <title>中国地图(疫情)</title>
 <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
- <link rel="stylesheet" type="text/css" href="style.css" />
+
 <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="../../echarts-html5-canvas-map/js/jquery-1.11.1.min.js"></script>
 <script src="../../echarts-html5-canvas-map/js/echarts.min.js"></script>
 <script src="../../echarts-html5-canvas-map/js/china.js"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
- <link rel="stylesheet" href="/resources/demos/style.css">
  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+<script src="allProvince.js"></script>
+ <link rel="stylesheet" type="text/css" href="style.css" />
 <!-- 折线图-->
 <script type="text/javascript">
 		
@@ -227,8 +227,10 @@ function drawLine(data1,data2,chartname)//data1,data2
 				var citylist=data[i].children;
 				for(var j in citylist)
 				{
-					cityMap.push({'name':citylist[j].name,'value':citylist[j].total.confirm});
+					
+					cityMap.push({"name":citylist[j].name,"value":citylist[j].total.confirm});
 				}
+				console.log(cityMap);
 				break;
 			}
 		}
@@ -268,7 +270,7 @@ function drawLine(data1,data2,chartname)//data1,data2
             {
                 name: provName,
                 type: 'map',
-                mapType: 'province',
+                mapType: provName,
 				//鼠标点击选中
                 //selectedMode: 'multiple',
                 label: {
@@ -312,6 +314,10 @@ function drawLine(data1,data2,chartname)//data1,data2
 	function drawTable(dataMap)
 	{
 		div=document.createElement("div");
+		h2=document.createElement("h2");
+		h2.innerHTML="省份统计数据";
+		h2.align="center";
+		div.appendChild(h2);
 		table = document.createElement("table");
 		tBody = document.createElement("tBody");
 		tr = document.createElement("tr");
@@ -410,11 +416,12 @@ function drawTotal(data)
 	}
 </script>
 
+<!--设置谣言版数据-->
 <script>
 	function initRumor()
 	{
 			//获取谣言数据
-			var url='../rumor.json';
+			var url='../data/rumor.json';
 			var requst=new XMLHttpRequest();
 			requst.open('get',url);
 			requst.send(null);
@@ -442,7 +449,7 @@ function drawTotal(data)
 <script>
 	function initNews()
 	{
-			var url='../news.json';
+			var url='../data/news.json';
 			var requst=new XMLHttpRequest();
 			requst.open('get',url);
 			requst.send(null);
@@ -458,7 +465,7 @@ function drawTotal(data)
 					var len=news.length;					
 					for(var i=0;i<len;i++)
 					{		
-						console.log(newsjson[i].title);
+						//console.log(newsjson[i].title);
 						news[i].href=newsjson[i].sourceUrl;
 						news[i].innerHTML=newsjson[i].title;
 					}
@@ -505,7 +512,7 @@ function drawTotal(data)
 <div id="buttons" style="text-align: center;margin: 0 auto;">
 <button type="button" class="btn btn-default" id="confirm_sus" onClick=switchChart(this.id,historyjson)>确诊/疑似趋势</button>
 <button type="button" class="btn btn-default" id="heal_dead" onClick=switchChart(this.id,historyjson)>累计治愈/死亡</button>
-<button type="button" class="btn btn-default">默认</button>
+<button type="button" class="btn btn-default" id='return' onClick=drawChina(dataMap)>返回</button>
 </div>
 <br>
 <div id="board" style="height:800px;">
@@ -565,11 +572,12 @@ function drawTotal(data)
 
 
 <script>
-		  	var url='../updated.json';
+		  	var url='../data/updated.json';
 			var requst=new XMLHttpRequest();
 			requst.open('get',url);
 			requst.send(null);
-			var dataset  ////
+			var dataset;  ////
+			var dataMap=[];
 			requst.onreadystatechange=function()
 			{
 			 if (requst.status == 200 && requst.readyState == 4 ) {
@@ -582,7 +590,7 @@ function drawTotal(data)
 					datafortotal.push(json.chinaTotal.heal);
 					datafortotal.push(json.chinaTotal.dead);
 					drawTotal(datafortotal);
-					var dataMap=[];
+					
 						for (var i in dataset)
 				{	 				
 				dataMap.push({"name":dataset[i].name,"value":dataset[i].total.confirm,"suspect":dataset[i].total.suspect,"dead":dataset[i].total.dead,"heal":dataset[i].total.heal});
@@ -592,7 +600,7 @@ function drawTotal(data)
 				}										
 			}
 
-			var url2='../history.json';
+			var url2='../data/history.json';
 			var requst2=new XMLHttpRequest();
 			requst2.open('get',url2);
 			requst2.send(null);
