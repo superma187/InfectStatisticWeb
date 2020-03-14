@@ -137,12 +137,12 @@ function drawLine(data1,data2,chartname)//data1,data2
     // 全国省份列表					
  function drawChina(dataMap)
  {
-	    
+	    mapType="country";
     // 绘制图表，准备数据
     var option = {
 		title: {  
-                  text: '疫情地图',  
-                  subtext: '',  
+                  text: '全国疫情地图',  
+                  subtext: '数据来源于腾讯',  
 				  
 				  textStyle: {
 				  fontSize: '34',
@@ -208,6 +208,7 @@ function drawLine(data1,data2,chartname)//data1,data2
     //使用制定的配置项和数据显示图表
     myChart.setOption(option);
 	myChart.on('click', function (params) {
+			mapType="province";
 			drawProvince(params.name,dataset);
      });
  }
@@ -500,7 +501,8 @@ function drawTotal(data)
             <td class="tds" style="color:black;"> x  </td>
         </tr>
     </table>
-    </div>
+	<p id="lastTime" style="position:absolute;left:25%;"></p>
+</div>
 <br>
 
 <!-- 地图的容器 -->
@@ -572,6 +574,8 @@ function drawTotal(data)
 
 
 <script>
+			var mapType="country";
+			
 		  	var url='../data/updated.json';
 			var requst=new XMLHttpRequest();
 			requst.open('get',url);
@@ -582,6 +586,8 @@ function drawTotal(data)
 			{
 			 if (requst.status == 200 && requst.readyState == 4 ) {
                     var json = JSON.parse(requst.responseText);	
+					var timeTag=document.getElementById('lastTime');
+					timeTag.innerHTML="数据日期截至"+json.lastUpdateTime;
 					dataset=json.areaTree[0].children;
 					var datafortotal=[];
 					datafortotal.push(json.chinaTotal.nowConfirm);					
