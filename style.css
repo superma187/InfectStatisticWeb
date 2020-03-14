@@ -137,4 +137,12 @@
         border-color: azure;
         border-width: 5px;
     }
+    h2{
+        width:200px;
+        height: 45px;
+        margin:auto;
+        background-color: aliceblue;
+        z-index:1;
+        text-shadow: 5px 5px 5px rgb(26, 24, 24);
+    }
     
